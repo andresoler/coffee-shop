@@ -1,0 +1,25 @@
+# Dependency directories
+node_modules/
+/generated/prisma/
+
+# Local SQLite database
+/prisma/*.db
+/prisma/*.db-journal
+
+# Vite cache
+/.vite-cache/
+
+# Environment variables (keep out of source control)
+.env
+.env*.local
+.env.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# System files
+.DS_Store
+Thumbs.db

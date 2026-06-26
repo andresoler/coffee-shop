@@ -1,0 +1,29 @@
+{
+  "name": "coffee-shop",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node scripts/dev.js",
+    "server": "node server.js",
+    "client": "npm --prefix client run dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@prisma/client": "^7.8.0",
+    "body-parser": "^2.3.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "npx": "^10.2.2",
+    "prisma": "^7.8.0",
+    "socket.io": "^4.8.3",
+    "sqlite3": "^6.0.1"
+  },
+  "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "better-sqlite3": "^12.11.1"
+  }
+}

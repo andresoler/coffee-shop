@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Order {
+  id        Int     @id @default(autoincrement())
+  customer  String
+  items     Json    // [ {name: string, price: number}, ... ]
+  status    String  @default("PENDING") 
+              // PENDING -> PREPARING -> READY
+  createdAt DateTime @default(now())
+
+}
+
+// Modelo de producto estático para referencia (no obligatorio en DB pero útil)
+model Product {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  price     Decimal 
+  category  String?
+}
+
+// Datos iniciales simulados al migrar si no existen, o usar seeders externos.
