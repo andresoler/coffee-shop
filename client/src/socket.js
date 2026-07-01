@@ -1,10 +1,33 @@
 import { io } from 'socket.io-client';
 
-// Si estás probando fuera del host, ajusta a tu IP (ej: http://192.168.x.x:3001)
-// En desarrollo, conectamos al mismo host/IP que sirve la web pero en el puerto del backend (3001).
-// En producción (cuando el servidor sirve el build estático), se usa la misma URL de origen (undefined).
-const SOCKET_URL = import.meta.env.DEV 
-  ? `${window.location.protocol}//${window.location.hostname}:${import.meta.env.VITE_PORT_SOCKET || 3001}` 
-  : undefined;
+// El servidor corre en el puerto 3001 en desarrollo local
+const URL = import.meta.env.PROD ? '/' : 'http://localhost:3001';
 
-export const socket = io(SOCKET_URL, { autoConnect: true });
+export const socket = io(URL, {
+  autoConnect: false
+});
+
+/**
+ * Conecta el socket con el servidor, adjuntando opcionalmente el token JWT.
+ * @param {string|null} token - El token JWT del administrador.
+ */
+export const connectSocket = (token = null) => {
+  if (token) {
+    socket.auth = { token };
+  } else {
+    socket.auth = {};
+  }
+  
+  if (!socket.connected) {
+    socket.connect();
+  }
+};
+
+/**
+ * Desconecta el socket si está conectado.
+ */
+export const disconnectSocket = () => {
+  if (socket.connected) {
+    socket.disconnect();
+  }
+};

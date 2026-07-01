@@ -29,4 +29,9 @@ model Product {
   category  String?
 }
 
-// Datos iniciales simulados al migrar si no existen, o usar seeders externos.
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String // Hashed password
+}
+
