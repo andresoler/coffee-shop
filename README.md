@@ -14,12 +14,12 @@ Una aplicación moderna y ligera de pedidos en tiempo real diseñada para cafete
 
 ## 🚀 Características Clave
 
-- **Quiosco de Pedidos Interactivo**: Interfaz simple e intuitiva para que los clientes elijan sus bebidas y registren su pedido.
-- **Flujo en Tiempo Real**: Notificaciones y actualizaciones instantáneas sin necesidad de recargar la página gracias a **Socket.io**.
-- **Panel de Control Seguro**: Sección de cocina protegida por autenticación con **JWT (JSON Web Tokens)** y hashing de contraseñas con **Bcrypt**.
-- **Seguridad en Websockets**: Middleware que valida la sesión antes de autorizar la visualización de órdenes o los cambios de estado (e.g. de *Pendiente* a *Preparando*).
-- **Base de Datos Local**: Persistencia robusta utilizando **SQLite** con el ORM de **Prisma**.
-- **Despliegue Local Rápido**: Totalmente optimizado para funcionar dentro de una red Wi-Fi o LAN corporativa.
+- **Quiosco y Tablero Integrado**: Interfaz en dos columnas para realizar pedidos a la izquierda y visualizar el tablero de turnos compacto a la derecha.
+- **Tablero para TV (`/board`)**: Vista a pantalla completa optimizada con tipografía de alta visibilidad para monitores o SmartTVs en el local.
+- **Flujo en Tiempo Real Seguro**: Notificaciones y actualizaciones instantáneas sin recargas de página vía **Socket.io** (los clientes anónimos solo reciben datos públicos básicos protegiendo precios y detalles).
+- **Panel de Control de Cocina**: Sección protegida por autenticación con **JWT (JSON Web Tokens)** y contraseñas seguras con **Bcrypt**.
+- **Base de Datos y Archivador**: Persistencia local con **SQLite** y **Prisma**, que incluye archivado lógico de órdenes finalizadas (`READY` -> `ARCHIVED`) para maximizar rendimiento.
+- **Despliegue local (LAN)**: Optimizado para funcionar en redes Wi-Fi locales conectando múltiples terminales.
 
 ---
 
@@ -46,9 +46,10 @@ graph TD
 ├── client/                 # Código del Frontend (React + Vite)
 │   ├── src/
 │   │   ├── views/          # Vistas principales de la aplicación
-│   │   │   ├── KioskView.jsx    # Interfaz para que los clientes ordenen
+│   │   │   ├── KioskView.jsx    # Quiosco y estado de turnos integrado
 │   │   │   ├── LoginView.jsx    # Autenticación y registro inicial de admin
-│   │   │   └── KitchenView.jsx  # Gestión de preparación de bebidas
+│   │   │   ├── KitchenView.jsx  # Gestión de preparación de bebidas
+│   │   │   └── BoardView.jsx    # Tablero público a pantalla completa para TV
 │   │   ├── App.jsx         # Enrutador principal de React Router
 │   │   ├── socket.js       # Configuración y conector dinámico de Socket.io
 │   │   ├── index.css       # Estilos globales de Tailwind CSS
@@ -111,12 +112,14 @@ npm run dev
 ```
 
 Una vez iniciados los servicios:
-- 🛒 **Quiosco de Clientes:** Abre tu navegador e ingresa a `http://localhost:5173`
-- 🍳 **Panel de la Cocina:** Accede a `http://localhost:5173/kitchen` (serás redirigido a `/kitchen/login` para que ingreses las credenciales configuradas en el paso anterior).
+- 🛒 **Quiosco de Clientes:** Abre tu navegador en `http://localhost:5173`
+- 📺 **Tablero de Turnos (TV):** Abre tu navegador en `http://localhost:5173/board` para pantalla completa.
+- 🍳 **Panel de la Cocina:** Accede a `http://localhost:5173/kitchen` (serás redirigido a `/kitchen/login` para ingresar tus credenciales).
 
 ### Despliegue en Red Local (LAN)
 Para que los meseros, cocineros o clientes accedan desde otros dispositivos (smartphones, tablets, laptops) conectados a la misma red Wi-Fi:
 1. Obtén tu dirección IP local (ej. `192.168.1.45` en Windows a través de `ipconfig`).
 2. Indícales que accedan a:
    - Quiosco: `http://192.168.1.45:5173`
+   - Tablero de TV: `http://192.168.1.45:5173/board`
    - Cocina: `http://192.168.1.45:5173/kitchen`

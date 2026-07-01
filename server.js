@@ -143,18 +143,63 @@ io.use((socket, next) => {
   }
 });
 
+// --- FUNCIONES DE SOPORTE PARA TABLERO PÚBLICO ---
+
+// Obtener todas las órdenes que no estén archivadas para el tablero público
+const getPublicOrders = async () => {
+  return await prisma.order.findMany({
+    where: {
+      status: {
+        not: 'ARCHIVED'
+      }
+    },
+    select: {
+      id: true,
+      customer: true,
+      status: true,
+      createdAt: true
+    },
+    orderBy: {
+      id: 'asc'
+    }
+  });
+};
+
+// Transmitir actualización de tablero público a todos los conectados
+const broadcastPublicOrders = async () => {
+  try {
+    const publicOrders = await getPublicOrders();
+    io.emit('public_orders_update', publicOrders);
+  } catch (err) {
+    console.error("❌ Error al transmitir órdenes públicas:", err);
+  }
+};
+
 // --- LÓGICA SOCKET.IO TIEMPO REAL ---
 io.on('connection', socket => {
     console.log(`🟢 Cliente conectado: ${socket.id} (Admin: ${socket.isAdmin})`);
 
-    // Si es administrador, unir al canal de administradores y cargar órdenes activas
+    // Al conectar, enviar el estado actual del tablero público (válido para quiosco y admin)
+    getPublicOrders().then(publicOrders => {
+        socket.emit('load_public_orders', publicOrders);
+    }).catch(err => {
+        console.error("❌ Error al cargar órdenes públicas en conexión:", err);
+    });
+
+    // Si es administrador, unir al canal de administradores y cargar órdenes activas en detalle
     if (socket.isAdmin) {
         socket.join('admins');
         
-        prisma.order.findMany({ where: {} }).then(orders => {
+        prisma.order.findMany({ 
+            where: {
+                status: {
+                    not: 'ARCHIVED'
+                }
+            } 
+        }).then(orders => {
             socket.emit('load_pending_orders', orders); 
         }).catch(err => {
-            console.error("Error al cargar órdenes para admin:", err);
+            console.error("❌ Error al cargar órdenes para admin:", err);
         });
     }
 
@@ -176,6 +221,9 @@ io.on('connection', socket => {
             
             // Notificar a todos los administradores en el canal 'admins'
             io.to('admins').emit('order_added', newOrder); 
+            
+            // Actualizar tablero público
+            await broadcastPublicOrders();
         } catch (err) {
             socket.emit('error', err.message || "Error creando orden");
             console.error(err);
@@ -199,6 +247,36 @@ io.on('connection', socket => {
             io.to('admins').emit('order_updated', updated);
             console.log(`⚡ Orden #${orderId} -> ${status} por Admin: ${socket.adminUser}`);
 
+            // Actualizar tablero público
+            await broadcastPublicOrders();
+        } catch (err) {
+            socket.emit('error', err.message);
+        }
+    });
+
+    // Archivar órdenes finalizadas (READY -> ARCHIVED)
+    socket.on('archive_ready_orders', async () => {
+        if (!socket.isAdmin) {
+            console.log(`🛑 Intento de archivo de órdenes no autorizado por socket ${socket.id}`);
+            return socket.emit('error', 'No autorizado para realizar esta acción');
+        }
+
+        try {
+            await prisma.order.updateMany({
+                where: { status: 'READY' },
+                data: { status: 'ARCHIVED' }
+            });
+            
+            console.log(`🧹 Órdenes con estado READY archivadas por Admin: ${socket.adminUser}`);
+
+            // Recargar órdenes activas en los paneles de administradores
+            const activeOrders = await prisma.order.findMany({
+                where: { status: { not: 'ARCHIVED' } }
+            });
+            io.to('admins').emit('load_pending_orders', activeOrders);
+
+            // Actualizar tablero público (se eliminarán las que estaban READY)
+            await broadcastPublicOrders();
         } catch (err) {
             socket.emit('error', err.message);
         }
