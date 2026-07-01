@@ -27,13 +27,13 @@ Una aplicación moderna y ligera de pedidos en tiempo real diseñada para cafete
 
 ```mermaid
 graph TD
-    subgraph Frontend (React / Vite)
+    subgraph "Frontend (React / Vite)"
         A[Quiosco - /] -->|Socket.io: create_order| C(Servidor Express)
         B[Cocina/Admin - /kitchen] -->|REST API: Login JWT| C
         B -->|Socket.io: update_order_status | C
     end
-    subgraph Backend (Node.js & DB)
-        C -->|Prisma Client| D[(SQLite Database)]
+    subgraph "Backend (Node.js & DB)"
+        C -->|Prisma Client| D[("SQLite Database")]
     end
 ```
 
