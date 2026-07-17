@@ -8,6 +8,8 @@
 [![Prisma](https://img.shields.io/badge/Prisma-7.8.0-2D3748?logo=prisma&logoColor=white&style=flat-square)](https://www.prisma.io/)
 [![SQLite](https://img.shields.io/badge/SQLite-3.0-003B57?logo=sqlite&logoColor=white&style=flat-square)](https://sqlite.org/)
 
+**🌐 Demo en Vivo:** [https://as-coffee-shop.vercel.app/](https://as-coffee-shop.vercel.app/)
+
 Una aplicación moderna y ligera de pedidos en tiempo real diseñada para cafeterías locales. Cuenta con un **Quiosco de Clientes** interactivo y un **Panel de Administración y Cocina** protegido por contraseña, todo operado sobre una red local (LAN) y sincronizado de forma instantánea a través de WebSockets.
 
 ---
