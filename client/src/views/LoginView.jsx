@@ -12,7 +12,7 @@ export default function LoginView() {
   const [successMessage, setSuccessMessage] = useState('');
   
   const navigate = useNavigate();
-  const API_URL = import.meta.env.PROD ? '' : 'http://localhost:3001';
+  const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
 
   // Verificar si hay algún administrador registrado al cargar
   useEffect(() => {

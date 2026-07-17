@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
 // El servidor corre en el puerto 3001 en desarrollo local
-const URL = import.meta.env.PROD ? '/' : 'http://localhost:3001';
+const URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '' : 'http://localhost:3001');
 
 export const socket = io(URL, {
   autoConnect: false
